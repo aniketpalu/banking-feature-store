@@ -7,4 +7,4 @@ online_store:
 offline_store:
   type: file
 auth:
-    type: no_auth
+    type: kubernetes
