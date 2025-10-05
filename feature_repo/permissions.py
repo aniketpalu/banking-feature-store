@@ -9,6 +9,14 @@ from feast.permissions.policy import (
     GroupBasedPolicy,
     CombinedGroupNamespacePolicy
 )
+from feast.project import Project
+from feast.data_source import DataSource
+from feast.entity import Entity
+from feast.feature_service import FeatureService
+from feast.feature_view import FeatureView
+from feast.on_demand_feature_view import OnDemandFeatureView
+from feast.permissions.permission import Permission
+from feast.saved_dataset import SavedDataset
 
 # # Simple group definitions
 admin_groups = ["banking-admin"]
@@ -21,16 +29,13 @@ staging_namespaces = ["feast-staging"]
 
 
 resource_types_without_permissions = [
-    FeastObject.Project,
-    FeastObject.FeatureView,
-    FeastObject.OnDemandFeatureView,
-    FeastObject.BatchFeatureView,
-    FeastObject.StreamFeatureView,
-    FeastObject.Entity,
-    FeastObject.FeatureService,
-    FeastObject.DataSource,
-    FeastObject.ValidationReference,
-    FeastObject.SavedDataset,
+    Project,
+    FeatureView,
+    OnDemandFeatureView,
+    Entity,
+    FeatureService,
+    DataSource,
+    SavedDataset,
 ]
 
 admin_perm = Permission(
