@@ -58,11 +58,3 @@ ds_team_perm = Permission(
     policy=CombinedGroupNamespacePolicy(namespaces=staging_namespaces, groups=ds_team_groups),
     actions=[AuthzedAction.DESCRIBE] + READ
 )
-
-
-# # Export permissions
-permissions = [
-    admin_perm,
-    data_team_perm,
-    ds_team_perm,
-]
