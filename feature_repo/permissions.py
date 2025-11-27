@@ -44,8 +44,7 @@ admin_perm = Permission(
     name="admin_permissions",
     types=ALL_RESOURCE_TYPES,
     policy=CombinedGroupNamespacePolicy(groups=admin_groups, namespaces=namespace),
-    actions=ALL_ACTIONS,
-    description="Full administrative access for banking-admin group"
+    actions=ALL_ACTIONS
 )
 
 # 2. Data Engineers Permissions - Can create/modify features and read/write data
@@ -62,8 +61,7 @@ data_engineers_perm = Permission(
         AuthzedAction.READ_ONLINE,
         AuthzedAction.WRITE_OFFLINE,
         AuthzedAction.WRITE_ONLINE,
-    ],
-    description="Data engineers can create/modify feature definitions and read/write features"
+    ]
 )
 
 # 3. Data Scientists Permissions - Can read features for ML models (no write access)
@@ -75,8 +73,7 @@ data_scientists_perm = Permission(
         AuthzedAction.DESCRIBE,
         AuthzedAction.READ_OFFLINE,
         AuthzedAction.READ_ONLINE,
-    ],
-    description="Data scientists can read features for model training and inference"
+    ]
 )
 
 # 4. Read-Only Analysts Permissions - Can only read historical features (no online access)
@@ -87,8 +84,7 @@ read_only_analysts_perm = Permission(
     actions=[
         AuthzedAction.DESCRIBE,
         AuthzedAction.READ_OFFLINE,
-    ],
-    description="Read-only analysts can list resources and read historical features only"
+    ]
 )
 
 # 5. Restricted User Permissions - Can only list feature views
@@ -98,8 +94,7 @@ restricted_user_perm = Permission(
     policy=CombinedGroupNamespacePolicy(groups=restricted_user_groups, namespaces=namespace),
     actions=[
         AuthzedAction.DESCRIBE,
-    ],
-    description="Restricted users can only list feature views, no read/write access"
+    ]
 )
 
 # ============================================================================
