@@ -10,9 +10,6 @@ from features.transaction_aggregations import (
     transaction_30d_aggregations,
     transaction_90d_patterns
 )
-from features.customer_profile_features import (
-    customer_behavioral_profile
-)
 from features.atm_usage_features import (
     atm_usage_30d,
     atm_time_patterns
@@ -84,9 +81,6 @@ customer_charter_service = FeatureService(
 customer_behavior_service = FeatureService(
     name="customer_behavior_service",
     features=[
-        # Customer demographics and profile
-        customer_behavioral_profile,
-        
         # Transaction patterns
         transaction_7d_aggregations,
         transaction_30d_aggregations,
@@ -120,8 +114,6 @@ customer_behavior_service = FeatureService(
 call_prediction_service = FeatureService(
     name="call_prediction_service",
     features=[
-        # Customer demographics and profile
-        customer_behavioral_profile,
         
         # Call center history
         call_center_90d,
@@ -157,8 +149,6 @@ call_prediction_service = FeatureService(
 transaction_prediction_service = FeatureService(
     name="transaction_prediction_service",
     features=[
-        # Customer demographics and risk profile
-        customer_behavioral_profile,
         
         # Transaction patterns and aggregations
         transaction_7d_aggregations,
@@ -207,9 +197,6 @@ atm_optimization_service = FeatureService(
         atm_time_patterns,
         customer_atm_interaction,
         
-        # Customer demographics (for location preferences)
-        customer_behavioral_profile,
-        
         # Transaction patterns (for cash needs)
         transaction_30d_aggregations,
         customer_transaction_interaction,
@@ -239,9 +226,6 @@ branch_optimization_service = FeatureService(
         branch_visits_90d,
         branch_service_preferences,
         customer_branch_interaction,
-        
-        # Customer demographics and preferences
-        customer_behavioral_profile,
         
         # Call center patterns (for service demand)
         call_center_90d,
@@ -309,8 +293,6 @@ comprehensive_banking_service = FeatureService(
 risk_compliance_service = FeatureService(
     name="risk_compliance_service",
     features=[
-        # Customer risk profile
-        customer_behavioral_profile,
         
         # Transaction risk indicators
         transaction_7d_aggregations,
