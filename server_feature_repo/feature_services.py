@@ -5,7 +5,6 @@ Groups features by business use case for model training and serving
 from feast import FeatureService
 
 # Import all feature views
-from features.customer_features import customer_demographics_fv
 from features.transaction_aggregations import (
     transaction_7d_aggregations,
     transaction_30d_aggregations,
@@ -37,9 +36,6 @@ from features.branch_features import (
 from features.transaction_features import (
     transaction_details,
     customer_transaction_interaction
-)
-from features.simple_ondemand_features import (
-    calculate_simple_risk_score
 )
 
 # Customer Charter Model Feature Service
