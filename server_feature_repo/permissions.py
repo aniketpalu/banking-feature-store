@@ -1,6 +1,16 @@
 # Banking Feature Store Permissions Configuration
 # Demonstrates RBAC with groups and namespaces support
 # Uses CombinedGroupNamespacePolicy with namespace 'feast' for all permissions
+#
+# Permission Scenarios Implemented:
+# 1. Data Scientists: No access to DataSource (only FeatureView, FeatureService, Entity)
+# 2. Data Engineers: Access to everything EXCEPT DataSource
+# 3. Read-Only Analysts: Limited access (no transaction-related feature views)
+#    Note: Feast permissions work at resource type level, not individual feature view level.
+#    To restrict specific feature views by name (e.g., transaction-related), consider:
+#    - Implementing custom authorization middleware
+#    - Using feature view tags/metadata for application-level filtering
+#    - Creating separate feature view categories with different permissions
 
 from feast.feast_object import ALL_RESOURCE_TYPES
 from feast.permissions.action import READ, AuthzedAction, ALL_ACTIONS
@@ -35,6 +45,18 @@ resource_types = [
     SavedDataset,
 ]
 
+# Resource types for data engineers (excludes DataSource)
+# Scenario 2: Data engineers have access to everything BUT data sources
+data_engineers_resource_types = [
+    Project,
+    FeatureView,
+    OnDemandFeatureView,
+    Entity,
+    FeatureService,
+    SavedDataset,
+    # DataSource is intentionally excluded
+]
+
 # ============================================================================
 # Permission Definitions
 # ============================================================================
@@ -48,9 +70,10 @@ admin_perm = Permission(
 )
 
 # 2. Data Engineers Permissions - Can create/modify features and read/write data
+# Scenario 2: Access to everything BUT data sources
 data_engineers_perm = Permission(
     name="data_engineers_permissions",
-    types=resource_types,
+    types=data_engineers_resource_types,  # Excludes DataSource
     policy=CombinedGroupNamespacePolicy(groups=data_engineers_groups, namespaces=namespace),
     actions=[
         AuthzedAction.CREATE,
@@ -65,9 +88,10 @@ data_engineers_perm = Permission(
 )
 
 # 3. Data Scientists Permissions - Can read features for ML models (no write access)
+# Scenario 1: No access to DataSource
 data_scientists_perm = Permission(
     name="data_scientists_permissions",
-    types=[FeatureView, FeatureService, Entity],
+    types=[FeatureView, FeatureService, Entity],  # DataSource is intentionally excluded
     policy=CombinedGroupNamespacePolicy(groups=data_scientists_groups, namespaces=namespace),
     actions=[
         AuthzedAction.DESCRIBE,
@@ -79,7 +103,7 @@ data_scientists_perm = Permission(
 # 4. Read-Only Analysts Permissions - Can only read historical features (no online access)
 read_only_analysts_perm = Permission(
     name="read_only_analysts_permissions",
-    types=ALL_RESOURCE_TYPES,
+    types=[FeatureView, Entity, FeatureService],  # Limited types - excludes DataSource, SavedDataset, Project
     policy=CombinedGroupNamespacePolicy(groups=read_only_analysts_groups, namespaces=namespace),
     actions=[
         AuthzedAction.DESCRIBE,

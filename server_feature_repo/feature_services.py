@@ -48,7 +48,6 @@ customer_charter_service = FeatureService(
     name="customer_charter_service",
     features=[
         # Customer demographics and profile
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Branch interaction features
@@ -90,7 +89,6 @@ customer_behavior_service = FeatureService(
     name="customer_behavior_service",
     features=[
         # Customer demographics and profile
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Transaction patterns
@@ -127,7 +125,6 @@ call_prediction_service = FeatureService(
     name="call_prediction_service",
     features=[
         # Customer demographics and profile
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Call center history
@@ -165,7 +162,6 @@ transaction_prediction_service = FeatureService(
     name="transaction_prediction_service",
     features=[
         # Customer demographics and risk profile
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Transaction patterns and aggregations
@@ -216,7 +212,6 @@ atm_optimization_service = FeatureService(
         customer_atm_interaction,
         
         # Customer demographics (for location preferences)
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Transaction patterns (for cash needs)
@@ -250,7 +245,6 @@ branch_optimization_service = FeatureService(
         customer_branch_interaction,
         
         # Customer demographics and preferences
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Call center patterns (for service demand)
@@ -276,7 +270,6 @@ comprehensive_banking_service = FeatureService(
     name="comprehensive_banking_service",
     features=[
         # Customer features
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Transaction features
@@ -321,7 +314,6 @@ risk_compliance_service = FeatureService(
     name="risk_compliance_service",
     features=[
         # Customer risk profile
-        customer_demographics_fv,
         customer_behavioral_profile,
         
         # Transaction risk indicators
@@ -351,32 +343,3 @@ risk_compliance_service = FeatureService(
     },
     description="Feature service for risk assessment and compliance monitoring models"
 )
-
-# =============================================================================
-# ON-DEMAND FEATURE SERVICES
-# =============================================================================
-
-# Simple On-Demand Risk Scoring Service
-# Uses a basic on-demand feature transformation for risk scoring
-simple_ondemand_risk_service = FeatureService(
-    name="simple_ondemand_risk_service",
-    features=[
-        # Simple on-demand risk scoring
-        calculate_simple_risk_score,
-        
-        # Supporting features
-        customer_demographics_fv,
-    ],
-    tags={
-        "team": "risk_management",
-        "owner": "risk_management_team@bank.com",
-        "use_case": "simple_risk_scoring",
-        "model_type": "regression",
-        "target": "risk_score",
-        "business_impact": "medium",
-        "sla": "real_time",
-        "description": "Simple real-time risk scoring using on-demand transformations"
-    },
-    description="Simple real-time risk scoring using on-demand transformations"
-)
-
