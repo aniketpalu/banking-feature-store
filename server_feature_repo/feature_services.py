@@ -40,8 +40,6 @@ from features.transaction_features import (
 customer_charter_service = FeatureService(
     name="customer_charter_service",
     features=[
-        # Customer demographics and profile
-        customer_behavioral_profile,
         
         # Branch interaction features
         branch_visits_90d,
@@ -249,8 +247,6 @@ branch_optimization_service = FeatureService(
 comprehensive_banking_service = FeatureService(
     name="comprehensive_banking_service",
     features=[
-        # Customer features
-        customer_behavioral_profile,
         
         # Transaction features
         transaction_7d_aggregations,
