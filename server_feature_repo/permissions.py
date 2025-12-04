@@ -3,14 +3,11 @@
 # Uses CombinedGroupNamespacePolicy with namespace 'feast' for all permissions
 #
 # Permission Scenarios Implemented:
-# 1. Data Scientists: No access to DataSource (only FeatureView, FeatureService, Entity)
+# 1. Data Scientists: No access to DataSource AND no access to transaction-related feature views
+#    Uses name_patterns to exclude feature views containing "transaction" in the name
 # 2. Data Engineers: Access to everything EXCEPT DataSource
 # 3. Read-Only Analysts: Limited access (no transaction-related feature views)
-#    Note: Feast permissions work at resource type level, not individual feature view level.
-#    To restrict specific feature views by name (e.g., transaction-related), consider:
-#    - Implementing custom authorization middleware
-#    - Using feature view tags/metadata for application-level filtering
-#    - Creating separate feature view categories with different permissions
+#    Uses name_patterns to exclude feature views containing "transaction" in the name
 
 from feast.feast_object import ALL_RESOURCE_TYPES
 from feast.permissions.action import READ, AuthzedAction, ALL_ACTIONS
@@ -89,9 +86,13 @@ data_engineers_perm = Permission(
 
 # 3. Data Scientists Permissions - Can read features for ML models (no write access)
 # Scenario 1: No access to DataSource
+# Also restricts transaction-related feature views using name_patterns
+# Pattern matches feature views that do NOT contain "transaction" in the name
+# This excludes: transaction_*, customer_transaction_*, etc.
 data_scientists_perm = Permission(
     name="data_scientists_permissions",
     types=[FeatureView, FeatureService, Entity],  # DataSource is intentionally excluded
+    name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
     policy=CombinedGroupNamespacePolicy(groups=data_scientists_groups, namespaces=namespace),
     actions=[
         AuthzedAction.DESCRIBE,
@@ -101,9 +102,13 @@ data_scientists_perm = Permission(
 )
 
 # 4. Read-Only Analysts Permissions - Can only read historical features (no online access)
+# Scenario 3: No access to transaction-related feature views
+# Pattern matches feature views that do NOT contain "transaction" in the name
+# This excludes: transaction_*, customer_transaction_*, etc.
 read_only_analysts_perm = Permission(
     name="read_only_analysts_permissions",
     types=[FeatureView, Entity, FeatureService],  # Limited types - excludes DataSource, SavedDataset, Project
+    name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
     policy=CombinedGroupNamespacePolicy(groups=read_only_analysts_groups, namespaces=namespace),
     actions=[
         AuthzedAction.DESCRIBE,
