@@ -1,6 +1,5 @@
 # Banking Feature Store Permissions Configuration
-# Demonstrates RBAC with groups and namespaces support
-# Uses CombinedGroupNamespacePolicy with namespace 'feast' for all permissions
+# Demonstrates RBAC with groups support
 #
 # Permission Scenarios Implemented:
 # 1. Data Scientists: No access to DataSource AND no access to transaction-related feature views
@@ -12,7 +11,7 @@
 from feast.feast_object import ALL_RESOURCE_TYPES
 from feast.permissions.action import READ, AuthzedAction, ALL_ACTIONS
 from feast.permissions.permission import Permission
-from feast.permissions.policy import CombinedGroupNamespacePolicy
+from feast.permissions.policy import GroupBasedPolicy
 from feast.project import Project
 from feast.data_source import DataSource
 from feast.entity import Entity
@@ -62,7 +61,7 @@ data_engineers_resource_types = [
 admin_perm = Permission(
     name="admin_permissions",
     types=ALL_RESOURCE_TYPES,
-    policy=CombinedGroupNamespacePolicy(groups=admin_groups, namespaces=namespace),
+    policy=GroupBasedPolicy(groups=admin_groups),
     actions=ALL_ACTIONS
 )
 
@@ -71,7 +70,7 @@ admin_perm = Permission(
 data_engineers_perm = Permission(
     name="data_engineers_permissions",
     types=data_engineers_resource_types,  # Excludes DataSource
-    policy=CombinedGroupNamespacePolicy(groups=data_engineers_groups, namespaces=namespace),
+    policy=GroupBasedPolicy(groups=data_engineers_groups),
     actions=[
         AuthzedAction.CREATE,
         AuthzedAction.UPDATE,
@@ -93,7 +92,7 @@ data_scientists_perm = Permission(
     name="data_scientists_permissions",
     types=[FeatureView, FeatureService, Entity],  # DataSource is intentionally excluded
     name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
-    policy=CombinedGroupNamespacePolicy(groups=data_scientists_groups, namespaces=namespace),
+    policy=GroupBasedPolicy(groups=data_scientists_groups),
     actions=[
         AuthzedAction.DESCRIBE,
         AuthzedAction.READ_OFFLINE,
@@ -109,7 +108,7 @@ read_only_analysts_perm = Permission(
     name="read_only_analysts_permissions",
     types=[FeatureView, Entity, FeatureService],  # Limited types - excludes DataSource, SavedDataset, Project
     name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
-    policy=CombinedGroupNamespacePolicy(groups=read_only_analysts_groups, namespaces=namespace),
+    policy=GroupBasedPolicy(groups=read_only_analysts_groups),
     actions=[
         AuthzedAction.DESCRIBE,
         AuthzedAction.READ_OFFLINE,
@@ -120,7 +119,7 @@ read_only_analysts_perm = Permission(
 restricted_user_perm = Permission(
     name="restricted_user_permissions",
     types=[FeatureView],
-    policy=CombinedGroupNamespacePolicy(groups=restricted_user_groups, namespaces=namespace),
+    policy=GroupBasedPolicy(groups=restricted_user_groups),
     actions=[
         AuthzedAction.DESCRIBE,
     ]
