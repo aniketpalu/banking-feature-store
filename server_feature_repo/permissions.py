@@ -90,7 +90,7 @@ data_engineers_perm = Permission(
 # This excludes: transaction_*, customer_transaction_*, etc.
 data_scientists_perm = Permission(
     name="data_scientists_permissions",
-    types=[FeatureView, FeatureService, Entity],  # DataSource is intentionally excluded
+    types=[FeatureView, FeatureService, Entity, Project],  # DataSource is intentionally excluded
     name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
     policy=GroupBasedPolicy(groups=data_scientists_groups),
     actions=[
@@ -106,7 +106,7 @@ data_scientists_perm = Permission(
 # This excludes: transaction_*, customer_transaction_*, etc.
 read_only_analysts_perm = Permission(
     name="read_only_analysts_permissions",
-    types=[FeatureView, Entity, FeatureService],  # Limited types - excludes DataSource, SavedDataset, Project
+    types=[FeatureView, Entity, FeatureService, Project],  # Limited types - excludes DataSource, SavedDataset, Project
     name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
     policy=GroupBasedPolicy(groups=read_only_analysts_groups),
     actions=[
@@ -118,7 +118,7 @@ read_only_analysts_perm = Permission(
 # 5. Restricted User Permissions - Can only list feature views
 restricted_user_perm = Permission(
     name="restricted_user_permissions",
-    types=[FeatureView],
+    types=[FeatureView, Project],
     policy=GroupBasedPolicy(groups=restricted_user_groups),
     actions=[
         AuthzedAction.DESCRIBE,
