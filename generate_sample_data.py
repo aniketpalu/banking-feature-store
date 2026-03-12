@@ -151,27 +151,27 @@ def generate_call_center_data():
 def main():
     """Generate all sample data files"""
     # Create data directory inside feature_repo
-    os.makedirs('feature_repo/data', exist_ok=True)
+    os.makedirs('server_feature_repo/data', exist_ok=True)
     
     print("Generating customer data...")
     customer_df = generate_customer_data()
-    customer_df.to_parquet('feature_repo/data/customers.parquet', index=False)
+    customer_df.to_parquet('server_feature_repo/data/customers.parquet', index=False)
     
     print("Generating transaction data...")
     transaction_df = generate_transaction_data()
-    transaction_df.to_parquet('feature_repo/data/transactions.parquet', index=False)
+    transaction_df.to_parquet('server_feature_repo/data/transactions.parquet', index=False)
     
     print("Generating ATM usage data...")
     atm_df = generate_atm_usage_data()
-    atm_df.to_parquet('feature_repo/data/atm_usage.parquet', index=False)
+    atm_df.to_parquet('server_feature_repo/data/atm_usage.parquet', index=False)
     
     print("Generating branch visit data...")
     branch_df = generate_branch_visit_data()
-    branch_df.to_parquet('feature_repo/data/branch_visits.parquet', index=False)
+    branch_df.to_parquet('server_feature_repo/data/branch_visits.parquet', index=False)
     
     print("Generating call center data...")
     call_df = generate_call_center_data()
-    call_df.to_parquet('feature_repo/data/call_center.parquet', index=False)
+    call_df.to_parquet('server_feature_repo/data/call_center.parquet', index=False)
     
     print("Sample data generation completed!")
     print(f"Generated {len(customer_df)} customers")
