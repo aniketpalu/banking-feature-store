@@ -1,17 +1,7 @@
-# Banking Feature Store Permissions Configuration
-# Demonstrates RBAC with groups support
-#
-# Permission Scenarios Implemented:
-# 1. Data Scientists: No access to DataSource AND no access to transaction-related feature views
-#    Uses name_patterns to exclude feature views containing "transaction" in the name
-# 2. Data Engineers: Access to everything EXCEPT DataSource
-# 3. Read-Only Analysts: Limited access (no transaction-related feature views)
-#    Uses name_patterns to exclude feature views containing "transaction" in the name
-
 from feast.feast_object import ALL_RESOURCE_TYPES
 from feast.permissions.action import READ, AuthzedAction, ALL_ACTIONS
 from feast.permissions.permission import Permission
-from feast.permissions.policy import GroupBasedPolicy
+from feast.permissions.policy import GroupBasedPolicy, NamespaceBasedPolicy
 from feast.project import Project
 from feast.data_source import DataSource
 from feast.entity import Entity
@@ -20,29 +10,16 @@ from feast.feature_view import FeatureView
 from feast.on_demand_feature_view import OnDemandFeatureView
 from feast.saved_dataset import SavedDataset
 
-# Group definitions
-admin_groups = ["banking-admin"]
-data_engineers_groups = ["data-engineers"]
-data_scientists_groups = ["data-scientists"]
-read_only_analysts_groups = ["read-only-analysts"]
-restricted_user_groups = ["restricted-user"]
+# OIDC group definitions (Keycloak groups)
+admin_groups = ["feast-admins"]
+data_engineers_groups = ["feast-data-engineer"]
+data_scientists_groups = ["feast-data-scientists"]
+restricted_user_groups = ["feast-restricted-group"]
 
-# Namespace - always 'feast' for production
+# Namespace - only allow feast namespace for workbench pod access
 namespace = ["feast"]
 
-# Resource types for feature store operations
-resource_types = [
-    Project,
-    FeatureView,
-    OnDemandFeatureView,
-    Entity,
-    FeatureService,
-    DataSource,
-    SavedDataset,
-]
-
 # Resource types for data engineers (excludes DataSource)
-# Scenario 2: Data engineers have access to everything BUT data sources
 data_engineers_resource_types = [
     Project,
     FeatureView,
@@ -50,7 +27,6 @@ data_engineers_resource_types = [
     Entity,
     FeatureService,
     SavedDataset,
-    # DataSource is intentionally excluded
 ]
 
 # ============================================================================
@@ -66,10 +42,10 @@ admin_perm = Permission(
 )
 
 # 2. Data Engineers Permissions - Can create/modify features and read/write data
-# Scenario 2: Access to everything BUT data sources
+# Access to everything BUT data sources
 data_engineers_perm = Permission(
     name="data_engineers_permissions",
-    types=data_engineers_resource_types,  # Excludes DataSource
+    types=data_engineers_resource_types,
     policy=GroupBasedPolicy(groups=data_engineers_groups),
     actions=[
         AuthzedAction.CREATE,
@@ -84,14 +60,11 @@ data_engineers_perm = Permission(
 )
 
 # 3. Data Scientists Permissions - Can read features for ML models (no write access)
-# Scenario 1: No access to DataSource
-# Also restricts transaction-related feature views using name_patterns
-# Pattern matches feature views that do NOT contain "transaction" in the name
-# This excludes: transaction_*, customer_transaction_*, etc.
+# No access to DataSource, no access to transaction-related feature views
 data_scientists_perm = Permission(
     name="data_scientists_permissions",
-    types=[FeatureView, FeatureService, Entity, Project],  # DataSource is intentionally excluded
-    name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
+    types=[FeatureView, FeatureService, Entity, Project],
+    name_patterns=["^(?!.*transaction).*"],
     policy=GroupBasedPolicy(groups=data_scientists_groups),
     actions=[
         AuthzedAction.DESCRIBE,
@@ -100,22 +73,7 @@ data_scientists_perm = Permission(
     ]
 )
 
-# 4. Read-Only Analysts Permissions - Can only read historical features (no online access)
-# Scenario 3: No access to transaction-related feature views
-# Pattern matches feature views that do NOT contain "transaction" in the name
-# This excludes: transaction_*, customer_transaction_*, etc.
-read_only_analysts_perm = Permission(
-    name="read_only_analysts_permissions",
-    types=[FeatureView, Entity, FeatureService, Project],  # Limited types - excludes DataSource, SavedDataset, Project
-    name_patterns=["^(?!.*transaction).*"],  # Exclude feature views containing "transaction"
-    policy=GroupBasedPolicy(groups=read_only_analysts_groups),
-    actions=[
-        AuthzedAction.DESCRIBE,
-        AuthzedAction.READ_OFFLINE,
-    ]
-)
-
-# 5. Restricted User Permissions - Can only list feature views
+# 4. Restricted User Permissions - Can only list feature views
 restricted_user_perm = Permission(
     name="restricted_user_permissions",
     types=[FeatureView, Project],
@@ -123,6 +81,15 @@ restricted_user_perm = Permission(
     actions=[
         AuthzedAction.DESCRIBE,
     ]
+)
+
+# 5. Namespace-based Permissions - Allows workbench pods in feast namespace
+# Workbench pods authenticate via K8s SA token, namespace extracted by KubernetesTokenParser
+feast_namespace_perm = Permission(
+    name="feast_namespace_permissions",
+    types=ALL_RESOURCE_TYPES,
+    policy=NamespaceBasedPolicy(namespaces=namespace),
+    actions=ALL_ACTIONS,
 )
 
 # ============================================================================
@@ -133,6 +100,6 @@ permissions = [
     admin_perm,
     data_engineers_perm,
     data_scientists_perm,
-    read_only_analysts_perm,
     restricted_user_perm,
+    feast_namespace_perm,
 ]
